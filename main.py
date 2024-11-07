@@ -140,4 +140,4 @@ async def on_interaction(interaction: discord.Interaction):
             await interaction.followup.send("タイムアウトしました。もう一度やり直してください。")
 
 # ボット実行
-bot.run('TOKEN')
+bot.run(os.environ['TOKEN'])
