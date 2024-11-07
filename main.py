@@ -130,12 +130,12 @@ async def on_interaction(interaction: discord.Interaction):
         try:
             msg = await bot.wait_for('message', timeout=30.0, check=check)
             item = msg.content
-            if item in fridge_items:
+            if item not in fridge_items:  # 修正: 削除時にアイテムが存在しない場合の処理
+                await interaction.followup.send(f'{item} は冷蔵庫にありません。')
+            else:
                 del fridge_items[item]
                 save_fridge_items(fridge_items)
                 await interaction.followup.send(f'{item} を冷蔵庫から削除しました。')
-            else:
-                await interaction.followup.send(f'{item} は冷蔵庫にありません。')
         except asyncio.TimeoutError:  
             await interaction.followup.send("タイムアウトしました。もう一度やり直してください。")
 
