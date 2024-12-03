@@ -146,23 +146,26 @@ async def on_interaction(interaction: discord.Interaction):
     async def health_check(request):
         return web.Response(text="OK", status=200)
 
-    app = web.Application()
-    app.router.add_get('/health', health_check)
-
-    async def start_http_server():
+    # HTTP サーバーを開始する関数
+    def start_http_server():
+        app = web.Application()
+        app.router.add_get('/health', health_check)  # /health エンドポイントを追加
         runner = web.AppRunner(app)
-        await runner.setup()
-        site = web.TCPSite(runner, '0.0.0.0', int(os.environ.get("PORT", 49671)))
-        await site.start()
+    
+        async def run():
+            await runner.setup()
+            site = web.TCPSite(runner, '0.0.0.0', 8080)  # 0.0.0.0:8080で待機
+            await site.start()
+            
+    asyncio.create_task(run())
 
 
-# ボット実行
 async def main():
-    # 両方のタスクを並列で実行
-    await asyncio.gather(
-        bot.start(os.environ['TOKEN']),
-        start_http_server()
-    )
+    # Discordボットを開始
+    asyncio.create_task(bot.start(os.environ['TOKEN']))
 
-if __name__ == '__main__':
-    asyncio.run(main())
+    # HTTPサーバーを開始
+    start_http_server()
+
+    # Discordボットの停止を待機
+    await bot.wait_until_ready()
