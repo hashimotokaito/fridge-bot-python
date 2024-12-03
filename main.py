@@ -168,4 +168,4 @@ async def main():
     start_http_server()
 
     # Discordボットの停止を待機
-    await bot.wait_until_ready()
+    await asyncio.Event().wait()
