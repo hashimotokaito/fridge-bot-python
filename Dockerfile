@@ -21,7 +21,7 @@ RUN pip install -r requirements.txt
 COPY . /bot
 
 # ポート開放 (FlaskやUvicornで指定したポート)
-EXPOSE 49671
+EXPOSE 8080
 
 # 実行
 CMD ["python", "main.py"]
