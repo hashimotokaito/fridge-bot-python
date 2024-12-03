@@ -4,6 +4,7 @@ import os
 import asyncio
 from discord.ext import commands
 from discord.ui import Button, View
+from aiohttp import web
 
 # データ保存用のファイルパス
 fridge_file = 'fridge_items.json'
@@ -139,5 +140,29 @@ async def on_interaction(interaction: discord.Interaction):
         except asyncio.TimeoutError:  
             await interaction.followup.send("タイムアウトしました。もう一度やり直してください。")
 
+    # --------------------
+    # HTTPサーバー設定
+    # --------------------
+    async def health_check(request):
+        return web.Response(text="OK", status=200)
+
+    app = web.Application()
+    app.router.add_get('/health', health_check)
+
+    async def start_http_server():
+        runner = web.AppRunner(app)
+        await runner.setup()
+        site = web.TCPSite(runner, '0.0.0.0', int(os.environ.get("PORT", 49671)))
+        await site.start()
+
+
 # ボット実行
-bot.run(os.environ['TOKEN'])
+async def main():
+    # 両方のタスクを並列で実行
+    await asyncio.gather(
+        bot.start(os.environ['TOKEN']),
+        start_http_server()
+    )
+
+if __name__ == '__main__':
+    asyncio.run(main())
