@@ -146,26 +146,21 @@ async def on_interaction(interaction: discord.Interaction):
     async def health_check(request):
         return web.Response(text="OK", status=200)
 
-    # HTTP サーバーを開始する関数
-    def start_http_server():
-        app = web.Application()
-        app.router.add_get('/health', health_check)  # /health エンドポイントを追加
-        runner = web.AppRunner(app)
-    
-        async def run():
-            await runner.setup()
-            site = web.TCPSite(runner, '0.0.0.0', 8080)  # 0.0.0.0:8080で待機
-            await site.start()
-            
-    asyncio.create_task(run())
-
+    # HTTP サーバーの非同期実行関数
+async def start_http_server():
+    app = web.Application()
+    app.router.add_get('/health', lambda request: web.Response(text="OK", status=200))
+    runner = web.AppRunner(app)
+    await runner.setup()
+    site = web.TCPSite(runner, '0.0.0.0', 8080)
+    await site.start()
 
 async def main():
-    # Discordボットを開始
-    asyncio.create_task(bot.start(os.environ['TOKEN']))
+    # HTTPサーバー開始
+    asyncio.create_task(start_http_server())
 
-    # HTTPサーバーを開始
-    start_http_server()
+    # Discordボット開始
+    await bot.start(os.environ['TOKEN'])
 
-    # Discordボットの停止を待機
-    await asyncio.Event().wait()
+if __name__ == "__main__":
+    asyncio.run(main())
