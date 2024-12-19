@@ -67,7 +67,7 @@ async def on_ready():
 # 定期タスク: 5日以上経過した食材を通知
 @tasks.loop(hours=24)
 async def check_expired_items():
-    channel_id = 1311573131219042304  # 通知を送るチャンネルIDに置き換える
+    channel_id = 1319165421815074816  # 通知を送るチャンネルIDに置き換える
     channel = bot.get_channel(channel_id)
     if not channel:
         return
