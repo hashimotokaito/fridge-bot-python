@@ -38,7 +38,7 @@ def migrate_fridge_items(items):
 # 経過日数を計算
 def days_elapsed(added_on):
     try:
-        added_date = datetime.strptime(added_on.split(' ')[0], '%Y-%m-%d')
+        added_date = datetime.strptime(added_on, '%Y-%m-%d')
         return (datetime.now() - added_date).days
     except ValueError:
         return None
@@ -86,7 +86,7 @@ async def check_expired_items():
 @bot.tree.command(name='add', description='食材を追加します。')
 async def add(interaction: discord.Interaction, item: str, quantity: int = 1):
     now = datetime.now()
-    date_info = now.strftime('%Y-%m-%d 午前' if now.hour < 12 else '%Y-%m-%d 午後')
+    date_info = now.strftime('%Y-%m-%d')
 
     fridge_items[item] = {'quantity': quantity, 'added_on': date_info}
     save_fridge_items(fridge_items)
@@ -132,7 +132,7 @@ async def list_items(interaction: discord.Interaction):
             color_start = "**" if elapsed_days is not None and elapsed_days >= 5 else ""
             color_end = "**" if color_start else ""
             item_messages.append(
-                f'{color_start}{item}: {data["quantity"]} 個（追加日時: {data["added_on"]}, 経過日数: {elapsed_days or "不明"}日）{color_end}'
+            f'{item}: {data["quantity"]} 個（追加日時: {data["added_on"]}, 経過日数: {elapsed_days if elapsed_days is not None else "不明"}日）'
             )
         
         # 表示するメッセージを組み立て
