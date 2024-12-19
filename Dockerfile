@@ -16,6 +16,7 @@ ENV TERM xterm
 # pip install
 COPY requirements.txt /bot/
 RUN pip install -r requirements.txt
+RUN pip install requests
 
 # アプリケーションコードをコピー
 COPY . /bot
