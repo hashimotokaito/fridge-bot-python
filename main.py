@@ -71,11 +71,14 @@ async def check_expired_items():
     channel = bot.get_channel(channel_id)
     if not channel:
         return
+    
+    # 経過日数が5日以上かつ14日未満の食材を抽出
     expired_items = [
         f'{item}（追加日: {data["added_on"]}, 経過日数: {days_elapsed(data["added_on"])}日）'
         for item, data in fridge_items.items()
-        if days_elapsed(data['added_on']) is not None and days_elapsed(data['added_on']) >= 5
+        if (days := days_elapsed(data['added_on'])) is not None and 5 <= days < 14
     ]
+    
     if expired_items:
         message = "**以下の食材が5日以上経過しています:**\n" + "\n".join(expired_items)
         await channel.send(message)
